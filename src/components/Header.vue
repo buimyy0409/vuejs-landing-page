@@ -12,23 +12,26 @@ const currentUser = ref("");
 // Modal visibility states
 const showLoginModal = ref(false);
 const showSignupModal = ref(false);
-
+const showErrorModal = ref(false);
 // Function to handle signup
 function signUp() {
   if (!username.value || !password.value) {
-    message.value = "Username and password are required.";
+    message.value = "Username or password are required!";
+    showErrorModal.value = true;
     return;
   }
 
   const users = JSON.parse(localStorage.getItem("users")) || [];
   if (users.some(user => user.username === username.value)) {
-    message.value = "Username already exists.";
+    message.value = "Username already exists (╯︿╰)";
+    showErrorModal.value = true;
     return;
   }
 
   users.push({ username: username.value, password: password.value });
   localStorage.setItem("users", JSON.stringify(users));
-  message.value = "Signup successful! You can now log in.";
+  message.value = "Register successful! You can now log in.";
+  showErrorModal.value = true;
   showSignupModal.value = false; // Close signup modal
   clearFields();
 }
@@ -44,11 +47,14 @@ function logIn() {
   if (user) {
     isLoggedIn.value = true;
     currentUser.value = username.value;
-    message.value = `Welcome, ${username.value}!`;
+    message.value = "Sign in successfully! o(*^▽^*)o";
+    showErrorModal.value = true;
     showLoginModal.value = false; // Close login modal
     clearFields();
   } else {
-    message.value = "Invalid username or password.";
+    
+    message.value = "Invalid username or password 🥺";
+    showErrorModal.value = true;
   }
 }
 
@@ -56,7 +62,9 @@ function logIn() {
 function logOut() {
   isLoggedIn.value = false;
   currentUser.value = "";
-  message.value = "You have logged out.";
+  
+  message.value = "You have logged out ヾ(￣▽￣) Bye~";
+  showErrorModal.value = true;
 }
 
 // Clear input fields
@@ -101,7 +109,7 @@ function clearFields() {
           </li>
           <li v-if="isLoggedIn" class="cta-primary">
             <span>Welcome, {{ currentUser }}!</span>
-            <a href="#" class="ml-3 text-danger" @click.prevent="logOut">Log out</a>
+            <a href="#" class="ml-3 text-danger" @click.prevent="logOut" style="margin-left: 20px;">Log out</a>
           </li>
         </ul>
         <a
@@ -118,11 +126,15 @@ function clearFields() {
     <!-- Login Modal -->
     <div v-if="showLoginModal" class="modal">
       <div class="modal-content">
-        <h2>Login</h2>
-        <input v-model="username" type="text" placeholder="Username" />
-        <input v-model="password" type="password" placeholder="Password" />
-        <button @click="logIn">Login</button>
-        <button @click="showLoginModal = false">Close</button>
+        <h2>Sign in</h2>
+        <div style="margin-top: 10px;">
+          <input v-model="username" type="text" placeholder="Username" />
+        </div>
+        <div style="margin-top: 10px;">
+          <input v-model="password" type="password" placeholder="Password" />
+        </div>
+        <button @click="logIn">Sign in</button>
+        <buttonclose @click="showLoginModal = false">Close</buttonclose>
       </div>
     </div>
 
@@ -132,13 +144,20 @@ function clearFields() {
         <h2>Sign Up</h2>
         <input v-model="username" type="text" placeholder="Username" />
         <input v-model="password" type="password" placeholder="Password" />
-        <button @click="signUp">Sign Up</button>
-        <button @click="showSignupModal = false">Close</button>
+        <button @click="signUp">Register</button>
+        <buttonclose @click="showSignupModal = false">Close</buttonclose>
       </div>
     </div>
 
-    <!-- Message -->
-    <p>{{ message }}</p>
+    <div v-if="showErrorModal" class="modal">
+    <div class="modal-content" style="line-height: 1.5;">
+      <h3 style="margin-bottom: 15px;">{{ message }}</h3>
+      <buttonclose @click="showErrorModal = false">Close</buttonclose>
+    </div>
+    </div>
+
+    <!-- Message 
+    <p>{{ message }}</p> -->
   </nav>
 </template>
 
@@ -165,11 +184,45 @@ function clearFields() {
 
 button {
   margin: 10px;
-  padding: 10px;
+  margin-top: 15px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   cursor: pointer;
+  border: 1.8px solid #005f69; 
+  background-color: #fff;
+  border-radius: 8px;
 }
 
 button:hover {
   opacity: 0.8;
+  background-color: #005f69; 
+  color: #fff; 
+  border-color: #005f69 
 }
+
+buttonclose {
+  margin: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 6px;
+  padding-bottom: 7px;
+  cursor: pointer;
+  border: 1.8px solid #005f69; 
+  background-color: #fff;
+  color: black;
+  border-radius: 8px;
+}
+
+buttonclose:hover {
+  opacity: 0.8;
+  background-color: #f26f33;
+  color: #fff; 
+  border-color: #f26f33; 
+}
+
+
 </style>
